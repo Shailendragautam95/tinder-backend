@@ -1,0 +1,30 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Tinder Backend API",
+        "description": "API documentation for Tinder-like backend",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/people": {
+            "get": {
+                "tags": [
+                    "People"
+                ],
+                "summary": "Get list of all people",
+                "operationId": "48f7032d1333ee6a10b694ad02ce52ef",
+                "responses": {
+                    "200": {
+                        "description": "List of people"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "People",
+            "description": "People"
+        }
+    ]
+}

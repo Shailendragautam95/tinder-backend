@@ -9,28 +9,17 @@ use OpenApi\Annotations as OA;
 
 class PeopleController extends Controller
 {
-    /**
-     * @OA\Get(
-     *     path="/api/people",
-     *     summary="Get list of all people",
-     *     tags={"People"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="List of people"
-     *     )
-     * )
-     */
-
     public function index(Request $request)
     {
-        $userId = 1; // static user for assignment
+        $userId = 1; // static user for now
 
-        // People that user already liked or disliked
-        $excluded = Like::where('from_person_id', $userId)
-                        ->pluck('to_person_id');
+        // People the user already liked or disliked
+        $blockedIds = Like::where('from_person_id', $userId)
+                          ->pluck('to_person_id');
 
+        // Return only profiles NOT liked or disliked by this user
         $people = People::where('id', '!=', $userId)
-                        ->whereNotIn('id', $excluded)
+                        ->whereNotIn('id', $blockedIds)
                         ->paginate(10);
 
         return response()->json($people);

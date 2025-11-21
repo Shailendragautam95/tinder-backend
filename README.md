@@ -1,121 +1,139 @@
-# Tinder Backend API (Laravel)
+# Tinder Backend (Laravel API)
 
-A backend service similar to Tinder built using **Laravel 12**, providing APIs for:
-- Fetching people list
-- Like / Dislike functionality
-- Listing liked people
-- Scheduled task to mark “popular users”
-- Swagger API documentation
+A Laravel 12.x backend that powers the Tinder-style swipe application.  
+This project provides APIs for browsing people, liking/disliking profiles, viewing matches, and running scheduled checks for popular users.
 
-This project is part of the **Hyperhire PHP Tinder Assignment**.
+This backend works together with the mobile application:  
+👉 **https://github.com/Shailendragautam95/tinder-mobile**
 
 ---
 
-## 🚀 Tech Stack
+## 🚀 Features
 
-- **PHP 8.2**
-- **Laravel 12**
-- **MySQL**
-- **Swagger (L5 Swagger)**
-- **Laravel Scheduler / Cron**
-- **Laravel Seeders**
+### ✔ People API
+`GET /people`  
+Returns all available profiles excluding:
+- already liked profiles  
+- disliked profiles  
+- matched profiles  
+
+### ✔ Like / Dislike API
+`POST /like/{person_id}`  
+`POST /dislike/{person_id}`  
+
+Stores each record in the **likes** table using:
+- `from_person_id`
+- `to_person_id`
+- `is_liked` (TRUE/FALSE)
+
+### ✔ Liked Users API  
+`GET /liked`  
+Returns all profiles liked by the current user.
+
+### ✔ Matches API  
+`GET /matches`  
+Returns **mutual likes** (A liked B & B liked A).
+
+### ✔ Cron Job (Required by Assignment)
+A scheduler automatically checks:
+- If any user has received **more than 50 likes**
+- It sends an email notification to the admin
+
+Email is sent using **EmailJS**:
+- service_id → `service_6fzo6jm`  
+- template_id → `template_n4c8k9m`  
+- public_key → `0I2JufUykkyF4nAjD`  
+- Admin email → `UJJWAL@HYPERHIRE.IN`
+
+The job runs inside:
+app/Console/Commands/CheckPopularUsers.php
+
+
+And is scheduled in:
+app/Console/Kernel.php
+
+
+## 🛠 Tech Stack
+
+| Technology | Purpose |
+|-----------|---------|
+| **Laravel 12.x** | Main backend framework |
+| **MySQL** | Database |
+| **EmailJS** | Admin email notifications |
+| **Laravel Scheduler** | Cron jobs |
+| **Eloquent ORM** | Models & relationships |
 
 ---
 
-## 📦 Installation & Setup
+## 📁 Project Structure
 
-### 1️⃣ Clone the Repository
-
-    git clone https://github.com/Shailendragautam95/tinder-backend.git
-    cd tinder-backend
-
-2️⃣ Install PHP dependencies
-    composer install
-
-3️⃣ Create .env
-    cp .env.example .env
-
-    Set your DB credentials:
-
-    DB_DATABASE=tinder_app
-    DB_USERNAME=root
-    DB_PASSWORD=
-
-4️⃣ Generate application key
-    php artisan key:generate
-
-5️⃣ Run migrations
-    php artisan migrate    
-
-6️⃣ Seed sample data
-    php artisan db:seed
-
-7️⃣ Start local server
-    php artisan serve
-
-📘 API Documentation (Swagger)
-
-    Generate documentation:
-
-    php artisan l5-swagger:generate
-
-    Access Swagger UI: http://localhost:8000/api/documentation
-
-🔥 API Endpoints
-    📌 Get people list
-        GET /api/people
-
-    📌 Like a person
-        POST /api/like/{id}
-
-    📌 Dislike a person
-        POST /api/dislike/{id}
-
-    📌 List liked people
-        GET /api/liked  
-
-🕒 Scheduler (Popular Users)
-A cron job checks who received many likes.
-Run manually:
-php artisan check:popular-users
-
-Add cron job:
-* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1
+tinder-backend/
+│
+├── app/
+│ ├── Console/
+│ │ ├── Commands/CheckPopularUsers.php
+│ │ └── Kernel.php
+│ ├── Http/
+│ │ └── Controllers/
+│ ├── Models/
+│ │ └── User.php
+│ ├── Services/
+│ │ └── EmailService.php
+│
+├── routes/
+│ └── api.php
+│
+├── database/
+│ └── migrations/
+│
+├── composer.json
+└── README.md
 
 
-🗂 Project Structure
-app/
- ├── Console/
- │    └── Commands/CheckPopularUsers.php
- ├── Http/Controllers/
- │    ├── PeopleController.php
- │    └── LikeController.php
- ├── Models/
- │    ├── People.php
- │    └── Like.php
 
-database/
- ├── migrations/
- ├── seeders/PeopleSeeder.php
+---
 
-routes/
- └── api.php
+## ▶️ **Setup Instructions**
 
+### 1. Install dependencies
+composer install
 
-🧪 Testing (Manual + Swagger)
-Test endpoints with:
+2. Copy .env file
+cp .env.example .env
 
-Swagger
+3. Configure database in .env
 
-Postman
+DB_DATABASE=tinder_app
+DB_USERNAME=root
+DB_PASSWORD=
 
-Thunder Client (VSCode)
+4. Add EmailJS credentials in .env
 
-👤 Author
-Shailendra Kumar Gautam
-FullStack Developer | Assignment for Hyperhire
+EMAILJS_SERVICE_ID=service_6fzo6jm
+EMAILJS_TEMPLATE_ID=template_n4c8k9m
+EMAILJS_PUBLIC_KEY=0I2JufUykkyF4nAjD
+ADMIN_EMAIL=UJJWAL@HYPERHIRE.IN
 
-📜 License
-Open-source for assignment submission.
+5. Run migrations
+php artisan migrate
 
+6. Start server
+php artisan serve
 
+7. Start Scheduler (important)
+php artisan schedule:work
+
+📡 Available API Routes
+Method	    Endpoint	    Description
+GET	        /people	        List of profiles
+POST	    /like/{id}	    Like user
+POST	    /dislike/{id}	Dislike user
+GET	        /liked	        List of liked profiles
+GET	        /matches	    Mutual matches
+
+All routes are defined in:
+routes/api.php
+
+👨‍💻 Developer
+Name: Shailendra Gautam
+Assignment for Hyperhire
